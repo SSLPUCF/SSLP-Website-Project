@@ -1,0 +1,200 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+// To change the picture, change this file name, then update the alt text and
+// caption further down.
+import memberWork from '../../assets/photos/image.png';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EventList from '../components/EventList.astro';
+import { Content as Mission } from '../content/home/mission.md';
+import { site, socialLinks } from '../data/site';
+import { isoDay, todayInOrlando } from '../lib/dates';
+
+const today = todayInOrlando();
+const events = await getCollection('events');
+
+// An event happening today still counts as upcoming.
+const upcoming = events
+  .filter((event) => isoDay(event.data.date) >= today)
+  .sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+const past = events
+  .filter((event) => isoDay(event.data.date) < today)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const links = socialLinks.filter((link) => link.url);
+const missing = socialLinks.filter((link) => !link.url).map((link) => link.label);
+const missingNames = new Intl.ListFormat('en-US').format(missing);
+---
+
+<BaseLayout>
+  <div class="opening">
+    <div>
+      <h1>{site.fullName}</h1>
+      <div class="lead">
+        <Mission />
+      </div>
+
+      <ul class="actions">
+        {
+          links.map((link) => (
+            <li>
+              <a class:list={{ button: link.primary }} href={link.url}>
+                {link.action}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      {
+        missing.length > 0 && (
+          <p class="missing">
+            TODO: {missingNames} {missing.length > 1 ? 'links' : 'link'} not added yet.
+          </p>
+        )
+      }
+    </div>
+
+    <figure>
+      <Image
+        src={memberWork}
+        alt="3D model of a red and white propeller plane with a pilot in the cockpit, trailed by three small tethered craft, some labeled Mold Spore."
+        widths={[400, 640, 960, 1333]}
+        sizes="(min-width: 68rem) 32rem, (min-width: 62rem) 47vw, 94vw"
+        quality={90}
+        loading="eager"
+        fetchpriority="high"
+      />
+      <figcaption>Mold spore attack!</figcaption>
+    </figure>
+  </div>
+
+  <section class="split" aria-labelledby="upcoming-heading">
+    <h2 id="upcoming-heading">Upcoming events</h2>
+    <div>
+      <EventList events={upcoming} kind="upcoming" emptyText="No upcoming events are listed right now." />
+    </div>
+  </section>
+
+  <section class="split" aria-labelledby="past-heading">
+    <h2 id="past-heading">Past events</h2>
+    <div>
+      <EventList events={past} kind="past" emptyText="No past events are listed yet." />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* The extra space below sets the opening apart from the sections. */
+  .opening {
+    padding-block: clamp(0rem, 3vw, 2rem) clamp(3.5rem, 9vw, 6.5rem);
+  }
+
+  h1 {
+    font-size: var(--text-display);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin-bottom: var(--space-5);
+    max-width: 18ch;
+  }
+
+  .lead {
+    font-size: var(--text-lead);
+    line-height: 1.6;
+  }
+
+  .actions {
+    list-style: none;
+    margin: var(--space-6) 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-6);
+  }
+
+  .actions a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+  }
+
+  .actions .button {
+    padding-inline: var(--space-5);
+    font-weight: 600;
+    color: var(--on-accent);
+    background: var(--accent);
+    border: 2px solid var(--accent);
+    border-radius: 2px;
+    text-decoration: none;
+  }
+
+  .actions .button:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+
+  .missing {
+    margin: var(--space-3) 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  figure {
+    margin: var(--space-7) 0 0;
+  }
+
+  /* The whole picture always shows. It's never cropped. */
+  figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  figcaption {
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  /* Wide screens: picture beside the heading. The heading is a bit smaller here
+     so it still fits on two lines in half the width. */
+  @media (min-width: 62rem) {
+    .opening {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--space-6);
+      align-items: center;
+    }
+
+    h1 {
+      font-size: min(3.25rem, 4.6vw);
+    }
+
+    figure {
+      margin: 0;
+    }
+  }
+</style>
+
+<script>
+  // The page is only rebuilt when someone changes the site, so an event can pass
+  // while it still sits under "Upcoming". Move those down when the page opens.
+  import { todayInOrlando } from '../lib/dates';
+
+  const upcoming = document.querySelector('[data-events="upcoming"]');
+  const past = document.querySelector('[data-events="past"]');
+
+  if (upcoming && past) {
+    const today = todayInOrlando();
+    // Oldest first, each added to the top, so the most recent ends up first.
+    upcoming.querySelectorAll<HTMLElement>('li[data-date]').forEach((item) => {
+      if (item.dataset.date! < today) past.prepend(item);
+    });
+
+    for (const list of [upcoming, past]) {
+      const kind = list.getAttribute('data-events');
+      const empty = document.querySelector<HTMLElement>(`[data-empty="${kind}"]`);
+      if (empty) empty.hidden = list.children.length > 0;
+    }
+  }
+</script>

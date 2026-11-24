@@ -1,0 +1,73 @@
+---
+// Switches between light and dark mode. The label names the mode you'll get.
+// Both labels are in the HTML and CSS shows one, so it's right from the first
+// paint. The hidden one is also hidden from screen readers (display: none).
+---
+
+<button type="button" class="theme-toggle" data-theme-toggle>
+  <span class="to-dark">Dark mode</span>
+  <span class="to-light">Light mode</span>
+</button>
+
+<style>
+  /* Which label shows. These follow the same rules as the colors in tokens.css:
+     the system setting, unless data-theme on <html> overrides it. */
+  .to-light {
+    display: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .to-dark {
+      display: none;
+    }
+
+    :global(:root:not([data-theme='light'])) .to-light {
+      display: inline;
+    }
+  }
+
+  :global(:root[data-theme='dark']) .to-dark {
+    display: none;
+  }
+
+  :global(:root[data-theme='dark']) .to-light {
+    display: inline;
+  }
+
+  .theme-toggle {
+    font: inherit;
+    font-size: var(--text-sm);
+    min-height: 2.75rem;
+    min-width: 7.5rem;
+    padding: 0 var(--space-3);
+    color: var(--text);
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  .theme-toggle:hover {
+    background: var(--surface);
+  }
+
+  /* The button does nothing without JavaScript, so hide it. */
+  :global(html:not(.js)) .theme-toggle {
+    display: none;
+  }
+</style>
+
+<script>
+  const root = document.documentElement;
+  const button = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+  const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+  button?.addEventListener('click', () => {
+    const current = root.dataset.theme ?? (systemDark.matches ? 'dark' : 'light');
+    const next = current === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch {}
+  });
+</script>

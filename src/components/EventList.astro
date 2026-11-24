@@ -1,0 +1,85 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { isoDay, readableDay } from '../lib/dates';
+
+interface Props {
+  events: CollectionEntry<'events'>[];
+  kind: 'upcoming' | 'past';
+  emptyText: string;
+}
+
+const { events, kind, emptyText } = Astro.props;
+---
+
+<ul class="events" data-events={kind}>
+  {
+    events.map(({ data }) => (
+      <li data-date={data.placeholder ? undefined : isoDay(data.date)}>
+        <p class="date">
+          {data.placeholder ? (
+            'TODO: date'
+          ) : (
+            <time datetime={isoDay(data.date)}>{readableDay(data.date)}</time>
+          )}
+        </p>
+        <div>
+          <h3>{data.title}</h3>
+          <p>{data.location}</p>
+          {data.link && (
+            <p>
+              <a href={data.link}>
+                Event details<span class="visually-hidden"> for {data.title}</span>
+              </a>
+            </p>
+          )}
+        </div>
+      </li>
+    ))
+  }
+</ul>
+<p class="empty" data-empty={kind} hidden={events.length > 0}>{emptyText}</p>
+
+<style>
+  .events {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    display: grid;
+    gap: var(--space-1) var(--space-5);
+    max-width: none;
+    padding-block: var(--space-4);
+  }
+
+  /* Rules only between events. The section's own rule sits above the first. */
+  li + li {
+    border-top: 1px solid var(--line);
+  }
+
+  li:first-child {
+    padding-top: 0;
+  }
+
+  h3 {
+    margin: 0 0 var(--space-1);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  .date,
+  .empty {
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 40rem) {
+    li {
+      grid-template-columns: 8rem 1fr;
+      /* Lines the date up with the title's baseline. */
+      align-items: baseline;
+    }
+  }
+</style>

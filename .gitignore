@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+
+# Private files. These stay on officers' computers and are never uploaded.
+docs/
+CLAUDE.md
+.claude/

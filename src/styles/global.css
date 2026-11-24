@@ -1,0 +1,140 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.7;
+}
+
+main {
+  flex: 1;
+  padding-block: var(--space-7) var(--space-8);
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--page-width);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  margin: var(--space-7) 0 var(--space-3);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--text-3xl);
+  margin-top: 0;
+  max-width: 20ch;
+}
+
+h2 {
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+
+h3 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+p,
+li {
+  max-width: var(--measure);
+}
+
+p {
+  margin: 0 0 var(--space-4);
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+code {
+  font-family: var(--font-data);
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* A page section: <section class="split"> holding an h2 and one <div>.
+   Its rule is as wide as the header and footer. */
+.split {
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line-strong);
+}
+
+.split + .split {
+  margin-top: var(--space-7);
+}
+
+.split > h2 {
+  margin: 0 0 var(--space-4);
+}
+
+/* Wide screens: heading on the left, content filling the rest. */
+@media (min-width: 56rem) {
+  .split {
+    display: grid;
+    grid-template-columns: 16rem minmax(0, 1fr);
+    column-gap: var(--space-6);
+    align-items: baseline;
+  }
+
+  .split > h2 {
+    margin: 0;
+  }
+}
+
+/* Read by screen readers, not shown on screen. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--gutter);
+  top: -10rem;
+  z-index: 10;
+  padding: var(--space-2) var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+}
+
+.skip-link:focus {
+  top: var(--space-2);
+}

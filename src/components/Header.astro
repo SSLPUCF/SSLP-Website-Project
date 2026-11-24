@@ -1,0 +1,188 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../../assets/logos/v2slplogo.png';
+import ThemeToggle from './ThemeToggle.astro';
+import { pages, site } from '../data/site';
+import { url } from '../lib/url';
+
+const trimSlash = (path: string) => path.replace(/\/$/, '');
+const here = trimSlash(Astro.url.pathname);
+---
+
+<header class="site-header">
+  <div class="wrap bar">
+    <a class="brand" href={url('/')} aria-label={`${site.shortName} home`}>
+      <!-- alt is empty because the name sits right beside it -->
+      <Image src={logo} alt="" width={38} height={44} densities={[2, 3]} loading="eager" />
+      {site.shortName}
+    </a>
+
+    <div class="controls">
+      <ThemeToggle />
+      <button type="button" class="menu-button" aria-expanded="false" aria-controls="site-nav">
+        Menu
+      </button>
+    </div>
+
+    <nav id="site-nav" aria-label="Main">
+      <ul>
+        {
+          pages.map((page) => (
+            <li>
+              <a
+                href={url(page.path)}
+                aria-current={trimSlash(url(page.path)) === here ? 'page' : undefined}
+              >
+                {page.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: var(--space-5);
+    padding-block: var(--space-3);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 2.75rem;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: var(--text-xl);
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .controls {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  nav {
+    width: 100%;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: var(--text-sm);
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    text-decoration: underline;
+  }
+
+  nav a[aria-current='page'] {
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 0.5em;
+  }
+
+  .menu-button {
+    display: none;
+    font: inherit;
+    font-size: var(--text-sm);
+    min-height: 2.75rem;
+    padding: 0 var(--space-4);
+    color: var(--text);
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  /* Small screens: the links sit behind the Menu button.
+     Without JavaScript they stay visible. */
+  @media (max-width: 61.99rem) {
+    :global(html.js) .menu-button {
+      display: block;
+    }
+
+    :global(html.js) nav {
+      display: none;
+    }
+
+    :global(html.js) nav:global(.open) {
+      display: block;
+    }
+
+    nav ul {
+      margin-top: var(--space-3);
+    }
+
+    nav li {
+      max-width: none;
+      border-top: 1px solid var(--line);
+    }
+
+    nav a {
+      font-size: var(--text-base);
+    }
+  }
+
+  @media (min-width: 62rem) {
+    nav {
+      width: auto;
+      order: 1;
+      margin-left: auto;
+    }
+
+    .controls {
+      order: 2;
+    }
+
+    ul {
+      display: flex;
+      gap: var(--space-5);
+    }
+  }
+</style>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('.menu-button');
+  const nav = document.getElementById('site-nav');
+
+  const setOpen = (open: boolean) => {
+    nav?.classList.toggle('open', open);
+    button?.setAttribute('aria-expanded', String(open));
+    if (button) button.textContent = open ? 'Close' : 'Menu';
+  };
+
+  button?.addEventListener('click', () => {
+    setOpen(button.getAttribute('aria-expanded') !== 'true');
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && button?.getAttribute('aria-expanded') === 'true') {
+      setOpen(false);
+      button.focus();
+    }
+  });
+</script>

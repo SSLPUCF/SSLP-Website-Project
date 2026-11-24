@@ -1,0 +1,126 @@
+---
+// The footer is laid out like the title block on an engineering drawing.
+// It's the site's one drawing-style element, so don't repeat the look elsewhere.
+import { Image } from 'astro:assets';
+import logo from '../../assets/logos/v2slplogo.png';
+import { pages, site, socialLinks } from '../data/site';
+import { url } from '../lib/url';
+
+const readyPages = pages.filter((page) => page.ready);
+const comingPages = pages.filter((page) => !page.ready);
+const links = socialLinks.filter((link) => link.url);
+---
+
+<footer>
+  <div class="wrap">
+    <div class="title-block">
+      <div class="cell name">
+        <Image src={logo} alt="" width={64} height={74} densities={[2, 3]} />
+        <div>
+          <p class="field">Organization</p>
+          <p class="org">{site.fullName}</p>
+          <p>{site.school}</p>
+        </div>
+      </div>
+
+      <nav class="cell" aria-label="Footer">
+        <p class="field">Pages</p>
+        <ul>
+          {readyPages.map((page) => (
+            <li><a href={url(page.path)}>{page.label}</a></li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="cell">
+        <p class="field">Find us</p>
+        <ul>
+          {links.map((link) => (
+            <li><a href={link.url}>{link.label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      {
+        comingPages.length > 0 && (
+          <div class="cell coming">
+            <p>Coming soon: {comingPages.map((page) => page.label).join(', ')}.</p>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</footer>
+
+<style>
+  footer {
+    padding-bottom: var(--gutter);
+    font-size: var(--text-sm);
+  }
+
+  /* The 1px gap over a line-colored background draws the rules between cells. */
+  .title-block {
+    display: grid;
+    gap: 1px;
+    background: var(--line-strong);
+    border: 2px solid var(--line-strong);
+  }
+
+  .cell {
+    padding: var(--space-3) var(--space-4) var(--space-4);
+    background: var(--bg);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  .name {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .name :global(img) {
+    flex-shrink: 0;
+  }
+
+  .field {
+    margin-bottom: var(--space-2);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  .org {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--text-lg);
+    line-height: 1.3;
+    margin-bottom: var(--space-1);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li a {
+    display: inline-block;
+    padding-block: var(--space-1);
+  }
+
+  .coming {
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 40rem) {
+    .title-block {
+      grid-template-columns: 2fr 1fr 1fr;
+    }
+
+    .coming {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

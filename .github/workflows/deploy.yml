@@ -1,0 +1,35 @@
+# Builds the site and publishes it to GitHub Pages every time the main branch
+# changes. This is the standard workflow from Astro's guide:
+# https://docs.astro.build/en/guides/deploy/github/
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Adds a "Run workflow" button on the Actions tab.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the files
+        uses: actions/checkout@v7
+      - name: Install and build the site
+        uses: withastro/action@v6
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
