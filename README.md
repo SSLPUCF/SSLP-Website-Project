@@ -2,7 +2,7 @@
 
 The website for the Solidworks Student Leadership Program at UCF. You can change events and the About us page by editing text files. No coding needed.
 
-The site's public address is https://sslpucf.github.io/SSLP-Website/. It goes live after the first upload to GitHub.
+The site's public address is https://sslpucf.github.io/SSLP-Website-Project/.
 
 **Anything in these files can be seen by anyone** once it's uploaded to GitHub, even if it doesn't appear on the site. **Never put student information in them** (signup lists, NID emails, Discord handles or scores). Use made-up examples such as `test@test.com`.
 
@@ -13,7 +13,7 @@ You need [Node.js](https://nodejs.org/) version 22.23.4 or newer. To check what 
 1. Open a terminal in this folder. In VS Code, choose **Terminal**, then **New Terminal**.
 2. The first time only, run `npm install`. This needs an internet connection.
 3. Run `npm run dev`. The first run needs internet too, to download the fonts.
-4. Open http://localhost:4321/SSLP-Website/ in your browser. If the terminal shows a different port number, use that number instead of `4321`.
+4. Open http://localhost:4321/SSLP-Website-Project/ in your browser. If the terminal shows a different port number, use that number instead of `4321`.
 
 Saved changes show up in the browser. If one doesn't, refresh the page. To stop the site, press **Ctrl+C** in the terminal.
 

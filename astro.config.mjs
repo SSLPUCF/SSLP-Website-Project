@@ -6,7 +6,7 @@ export default defineConfig({
   // name exactly, capitals included. Internal links go through src/lib/url.ts.
   // When the club's own domain is connected: set `site` to it and delete `base`.
   site: 'https://sslpucf.github.io',
-  base: '/SSLP-Website',
+  base: '/SSLP-Website-Project',
 
   // Astro downloads these from Google Fonts when it builds and serves them from
   // our own site, so visitors' browsers never contact Google.
